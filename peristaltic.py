@@ -15,9 +15,9 @@ GPIO.setmode(GPIO.BCM)
 #GPIO.setwarnings(False)
 
 pumps = {'P1': (18, 25), #Dictionary
-         'P2': (8, 7),
-         'P3': (12, 16),
-         'WP': (20, 20)
+         'WP': (8, 8),
+         'P2': (7, 12),
+         'P3': (16, 20)
 }
 
 try:

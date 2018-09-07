@@ -15,7 +15,7 @@ pi.set_mode(STEP, pigpio.OUTPUT)
 
 # Set duty cycle and frequency
 pi.set_PWM_dutycycle(STEP, 128)  # PWM 1/2 On 1/2 Off
-pi.set_PWM_frequency(STEP, 1600)  # 1600 pulses (steps) per second
+pi.set_PWM_frequency(STEP, 100)  # 1600 pulses (steps) per second
 
 pi.write(DIR, 0)  # Set direction
 
