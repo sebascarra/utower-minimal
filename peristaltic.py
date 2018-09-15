@@ -15,8 +15,8 @@ GPIO.setmode(GPIO.BCM)
 #GPIO.setwarnings(False)
 
 pumps = {'P1': (18, 25), #Dictionary
-         'WP': (8, 8),
-         'P2': (7, 12),
+         'WP': (22, 22),
+         'P2': (27, 12),
          'P3': (16, 20)
 }
 
@@ -37,14 +37,6 @@ try:
   while True:
     try:
       # Makes the motor spin one way for 3 seconds
-      GPIO.output(pin1, True)
-      GPIO.output(pin2, False)
-      sleep(3)
-      # Idle for a sec
-      GPIO.output(pin1, False)
-      GPIO.output(pin2, False)
-      sleep(1)
-      # Spins the other way for a further 3 seconds
       GPIO.output(pin1, False)
       GPIO.output(pin2, True)
       sleep(3)
@@ -52,6 +44,14 @@ try:
       GPIO.output(pin1, False)
       GPIO.output(pin2, False)
       sleep(1)
+      # Spins the other way for a further 3 seconds
+      #GPIO.output(pin1, False)
+      #GPIO.output(pin2, True)
+      #sleep(3)
+      # Idle for a sec
+      #GPIO.output(pin1, False)
+      #GPIO.output(pin2, False)
+      #sleep(1)
     except(KeyboardInterrupt):
       # If a keyboard interrupt is detected then it exits cleanly!
       print('Finishing up!')
