@@ -9,7 +9,7 @@ import RPi.GPIO as GPIO
 import sys
 
 class ComputerBoard(object):
-
+# TODO: move to modules
   @staticmethod
   def Init():
     GPIO.setmode(GPIO.BCM)
