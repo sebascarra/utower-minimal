@@ -12,6 +12,7 @@ pump_pins = {
 pumps = {}
 
 def Init():
+  ComputerBoard.Init()
   for pump_name in pump_pins:
     pump = PeristalticPump(pump_name) 
     pumps[pump_name] = pump
