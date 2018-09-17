@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-# A program to control the movement of a single motor using the RTK MCB!
-# Composed by The Raspberry Pi Guy to accompany his tutorial!
-
-# Let's import the modules we will need!
 from time import sleep
 import sys
 import device_manager as DeviceManager

@@ -4,7 +4,6 @@ from peristaltic_pump import PeristalticPump
 
 pump_pins = {
     'P1': (18, 25),
-    'WP': (22, 22),
     'P2': (27, 12),
     'P3': (16, 20)
 }
