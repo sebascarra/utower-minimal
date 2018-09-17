@@ -10,11 +10,11 @@ class PeristalticPump(object):
   def name(self):
     return self._name
     
-  def Start(dir_forward=True):
+  def Start(self, dir_forward=True):
     DeviceManager.StartPump(self, dir_forward)
     self._is_on = True
 
-  def Stop():
+  def Stop(self):
     DeviceManager.StopPump(self)
     self._is_on = False
 
