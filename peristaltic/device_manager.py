@@ -32,6 +32,10 @@ def StopPump(peristaltic_pump):
   ComputerBoard.SetOutputToPin(pin1, False)
   ComputerBoard.SetOutputToPin(pin2, False)
 
+def StopAllPumps():
+  for pump in pumps.values():
+    pump.Stop()
+
 def _PumpPinsFromName(pump_name):
     pin1 = pump_pins[pump_name][0]
     pin2 = pump_pins[pump_name][1]

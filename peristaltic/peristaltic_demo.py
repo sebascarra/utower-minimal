@@ -17,7 +17,7 @@ def main(argv):
 
   DeviceManager.Init() #This is mandatory to use any of the available peristaltic pumps. Pump objects are created during the initialization of the DeviceManager.
   
-  pump_name = sys.argv[1] #The name of the pump to be tested is received as an argument.
+  pump_name = argv[1] #The name of the pump to be tested is received as an argument.
   try:
     pump = DeviceManager.pumps[pump_name] #Get pump object for the pump to be tested. 
   except KeyError as e:
@@ -41,8 +41,7 @@ def main(argv):
       print('Finishing up!')
     finally: #Freeing up resources is done through the device manager as it is the one that knows what pumps exist.
       DeviceManager.CleanFinalize() #This ensures a clean exit.
-      #TODO: apparently line 30 (pump.Start(dir_forward=True)) is being executed at least once after the "finally" sentence. This results in the following runtime error:
-      #RuntimeError: Please set pin numbering mode using GPIO.setmode(GPIO.BOARD) or GPIO.setmode(GPIO.BCM)
+      quit()
 
 if __name__ == "__main__":
   main(sys.argv)
