@@ -18,7 +18,7 @@ def Init():
     pin1, pin2 = _PumpPinsFromName(pump_name)
     ComputerBoard.InitializePinAsOutput(pin1)
     ComputerBoard.InitializePinAsOutput(pin2)
-    StopPump(pump)
+    pump.Stop()
 
 
 def StartPump(peristaltic_pump, dir_forward=True): 
@@ -32,13 +32,10 @@ def StopPump(peristaltic_pump):
   ComputerBoard.SetOutputToPin(pin1, False)
   ComputerBoard.SetOutputToPin(pin2, False)
 
-
-def StopAllPumps():
-  for pump in pumps.values():
-    StopPump(pump)
-
-
 def _PumpPinsFromName(pump_name):
     pin1 = pump_pins[pump_name][0]
     pin2 = pump_pins[pump_name][1]
     return pin1, pin2
+
+def CleanFinalize():
+  ComputerBoard.CleanFinalize()
