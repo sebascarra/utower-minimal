@@ -1,28 +1,29 @@
 #!/usr/bin/env python
 
 import sys
-sys.path.append('../')
 from time import sleep
-import device_manager.device_manager as DeviceManager
+import device_manager as DeviceManager
 
 def main():
 
   DeviceManager.Init() 
 
-  pump = DeviceManager.pump
+  pump = DeviceManager.water_pump
 
   print('Starting motor sequence!')
 
   while True:
     try:
-      DeviceManager.StartPump()
+      pump.Start()
       sleep(3)
-      DeviceManager.StopPump()
+      pump.Stop()
       sleep(1)
     except(KeyboardInterrupt):
       # If a keyboard interrupt is detected then it exits cleanly!
-      DeviceManager.StopPump()
+      pump.Stop()
       print('Finishing up!')
+    #finally: #Freeing up resources is done through the device manager as it is the one that knows what pumps exist.
+    # DeviceManager.CleanFinalize() #This ensures a clean exit.
       quit()
 
 

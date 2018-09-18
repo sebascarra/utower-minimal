@@ -1,6 +1,5 @@
 import sys
-sys.path.append('../')
-import device_manager.device_manager as DeviceManager
+import device_manager as DeviceManager
 
 class PeristalticPump(object):
 

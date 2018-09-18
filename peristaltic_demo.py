@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
 import sys
-sys.path.append('../')
 from time import sleep
-import device_manager.device_manager as DeviceManager
+import device_manager as DeviceManager
 
 #Correct usage:
 # -ComputerBoard knows what platform is being used and its physical characteristics.
@@ -20,7 +19,7 @@ def main(argv):
   
   pump_name = argv[1] #The name of the pump to be tested is received as an argument.
   try:
-    pump = DeviceManager.pumps[pump_name] #Get pump object for the pump to be tested. 
+    pump = DeviceManager.peristaltic_pumps[pump_name] #Get pump object for the pump to be tested. 
   except KeyError as e:
     print('Pump [{}] does not exist.'.format(pump_name))
     raise
@@ -28,11 +27,11 @@ def main(argv):
   print('Starting motor sequence!')  
   while True:
     try:
-      pump.Start(dir_forward=True) #From this point on we use exclusively functions inside the pump class, NOT the DeviceManager module.
+      pump.Start() #From this point on we use exclusively functions inside the pump class, NOT the DeviceManager module.
       sleep(3)
       pump.Stop()
       sleep(1)
-      pump.Start(dir_forward=False)
+      pump.Start()
       sleep(3)
       pump.Stop()
       sleep(1)
