@@ -1,15 +1,22 @@
-import device_manager as DeviceManager
+import sys
+sys.path.append('../')
+import device_manager.device_manager as DeviceManager
 
 class WaterPump(object):
 
   def __init__(self):
+    self._name = 'WP'
     self._is_on = False
+
+  @property
+  def name(self):
+    return self._name
     
-  def Start(dir_forward=True):
+  def Start(self):
     DeviceManager.StartPump(self)
     self._is_on = True
 
-  def Stop():
+  def Stop(self):
     DeviceManager.StopPump(self)
     self._is_on = False
 

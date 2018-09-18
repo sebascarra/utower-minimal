@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
+import sys
+sys.path.append('../')
 from time import sleep
-import device_manager as DeviceManager
+import device_manager.device_manager as DeviceManager
 
 def main():
 
