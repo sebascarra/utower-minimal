@@ -1,6 +1,8 @@
-import computer_board as ComputerBoard
+import sys
+sys.path.append('../')
+import computer_board.computer_board as ComputerBoard
 #import mock_computer_board as ComputerBoard
-from peristaltic_pump import PeristalticPump
+from peristaltic.peristaltic_pump import PeristalticPump
 
 pump_pins = {
     'P1': (18, 25),

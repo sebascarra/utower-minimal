@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
-from time import sleep
 import sys
-import device_manager as DeviceManager
+sys.path.append('../')
+from time import sleep
+import device_manager.device_manager as DeviceManager
 
 #Correct usage:
 # -ComputerBoard knows what platform is being used and its physical characteristics.
