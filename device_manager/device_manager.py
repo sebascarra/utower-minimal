@@ -1,8 +1,6 @@
-import sys
-sys.path.append('../')
-import computer_board.computer_board as ComputerBoard
-#import mock_computer_board as ComputerBoard
-from peristaltic.peristaltic_pump import PeristalticPump
+from __future__ import absolute_import
+#import computer_board.computer_board as ComputerBoard
+import mock_computer_board.mock_computer_board as ComputerBoard
 
 pump_pins = {
     'P1': (18, 25),
@@ -13,9 +11,10 @@ pump_pins = {
 pumps = {}
 
 def Init():
+  import peristaltic.peristaltic_pump as Peristaltic
   ComputerBoard.Init()
   for pump_name in pump_pins:
-    pump = PeristalticPump(pump_name) 
+    pump = Peristaltic.PeristalticPump(pump_name) 
     pumps[pump_name] = pump
     pin1, pin2 = _PumpPinsFromName(pump_name)
     ComputerBoard.InitializePinAsOutput(pin1)

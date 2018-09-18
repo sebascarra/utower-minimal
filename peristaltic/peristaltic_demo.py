@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-
+from __future__ import absolute_import
 import sys
-sys.path.append('../')
 from time import sleep
 import device_manager.device_manager as DeviceManager
 
