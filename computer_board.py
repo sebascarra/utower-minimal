@@ -24,10 +24,9 @@ class ProbeSerialReader(object):
     self._ph = 0.00
     self._ec_port = serial.Serial(ec_port, 9600)
     self._ph_port = serial.Serial(ph_port, 9600)
-    self._serialPortsThread = threading.Thread(target=self._serialReader())
+    self._serialPortsThread = threading.Thread(target=self._serialReader)
     self._serialPortsThread.setDaemon(True)
     
-  @property
   def measurements(self):
     return (self._ec, self._ph)
 
@@ -50,12 +49,12 @@ class ProbeSerialReader(object):
         ec = self._readline(self._ec_port)
         ph = self._readline(self._ph_port)
         if ec:
-            self._ec = ec
+            self._ec = float(ec)
         if ph:
-            self._ph = ph
+            self._ph = float(ph)
 
-  def Init():
-      _serialPortsThread.start()
+  def Init(self):
+      self._serialPortsThread.start()
       #_serialPortsThread.join()
 
 # (*): The function node takes only one parameter, but is located in a class. Given the implicit class instance and your parameter, that's 2 arguments. To fix it, you can edit the function to

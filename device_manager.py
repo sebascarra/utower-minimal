@@ -1,6 +1,6 @@
 import sys
-#import computer_board as ComputerBoard
-import mock_computer_board as ComputerBoard
+import computer_board as ComputerBoard
+#import mock_computer_board as ComputerBoard
 from peristaltic_pump import PeristalticPump
 from water_pump import WaterPump
 from probes_module import ecPhProbes
@@ -56,6 +56,8 @@ def Init():
 
 #Auxiliary functions: ########################################################
 
+  #For peristaltic pumps:
+
 def StartPump(pump, dir_forward=True):
   if pump.name != 'WP':
     #Procedure for peristaltics:
@@ -83,11 +85,12 @@ def StopAllPumps():
   #Procedure for water pump:
   water_pump.Stop()
   
-
 def _PeristalticPinsFromName(pump_name):
     pin1 = peristaltic_pins[pump_name][0]
     pin2 = peristaltic_pins[pump_name][1]
     return pin1, pin2
+
+  #For EC and pH probes:
 
 def updateMeasurements():
   (ec, ph) = serialReader.measurements()

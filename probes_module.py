@@ -8,7 +8,7 @@ class ecPhProbes(object):
     self._ph = 0.00
 
   def getMeasurements(self):
-    (ec, ph) = DeviceManager.getMeasurements(self)
+    (ec, ph) = DeviceManager.updateMeasurements()
     self._ec = ec
     self._ph = ph
     return (self._ec, self._ph)

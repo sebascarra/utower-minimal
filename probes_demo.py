@@ -14,12 +14,10 @@ def main():
   while True:
     try:
       print "measurements: ", probes.getMeasurements() #From this point on we use exclusively functions inside the pump class, NOT the DeviceManager module.
-      sleep(3)
+      sleep(4)
     except(KeyboardInterrupt):
       # If a keyboard interrupt is detected then it exits cleanly!
       print('Finishing up!')
-    finally: #Freeing up resources is done through the device manager as it is the one that knows what pumps exist.
-      DeviceManager.CleanFinalize() #This ensures a clean exit.
       quit()
 
 if __name__ == "__main__":
