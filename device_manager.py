@@ -1,6 +1,6 @@
 import sys
-import computer_board as ComputerBoard
-#import mock_computer_board as ComputerBoard
+#import computer_board as ComputerBoard
+import mock_computer_board as ComputerBoard
 from peristaltic_pump import PeristalticPump
 from water_pump import WaterPump
 from probes import ecPhProbes
