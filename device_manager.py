@@ -1,9 +1,9 @@
 import sys
-import computer_board as ComputerBoard
-#import mock_computer_board as ComputerBoard
+#import computer_board as ComputerBoard
+import mock_computer_board as ComputerBoard
 from peristaltic_pump import PeristalticPump
 from water_pump import WaterPump
-from probes import ecPhProbes
+from probes_module import ecPhProbes
 
 #Initialize board pins to be used by hardware components.
 ComputerBoard.Init()
@@ -51,7 +51,7 @@ def Init():
   #Initialize EC and PH probes:
   global probes
   probes = ecPhProbes()
-  ComputerBoard.ProbeSerialReader.Init()
+  serialReader.Init()
   probes.getMeasurements()
 
 #Auxiliary functions: ########################################################
@@ -90,7 +90,7 @@ def _PeristalticPinsFromName(pump_name):
     return pin1, pin2
 
 def updateMeasurements():
-  (ec, ph) = ComputerBoard.ProbeSerialReader.measurements()
+  (ec, ph) = serialReader.measurements()
   return (ec, ph)
 
 #End of auxiliary functions. ###################################################
