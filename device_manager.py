@@ -92,9 +92,8 @@ def _PeristalticPinsFromName(pump_name):
 
   #For EC and pH probes:
 
-def updateMeasurements():
-  (ec, ph) = serialReader.measurements()
-  return (ec, ph)
+def getMeasurements():
+  return serialReader.measurements()
 
 #End of auxiliary functions. ###################################################
 
