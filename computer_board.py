@@ -24,7 +24,7 @@ class ProbeSerialReader(object):
     self._ph = 0.00
     self._ec_port = serial.Serial(ec_port, 9600)
     self._ph_port = serial.Serial(ph_port, 9600)
-    self._serialPortsThread = threading.Thread(target=self._serialReader)
+    self._serialPortsThread = threading.Thread(target=self._runSerialReader)
     self._serialPortsThread.setDaemon(True)
     
   def measurements(self):
@@ -44,7 +44,7 @@ class ProbeSerialReader(object):
               break
       return bytes(line)
 
-  def _serialReader(self):
+  def _runSerialReader(self):
     while True:
         ec = self._readline(self._ec_port)
         ph = self._readline(self._ph_port)
@@ -53,7 +53,7 @@ class ProbeSerialReader(object):
         if ph:
             self._ph = float(ph)
 
-  def Init(self):
+  def Start(self):
       self._serialPortsThread.start()
       #_serialPortsThread.join()
 

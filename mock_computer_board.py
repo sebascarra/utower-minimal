@@ -32,7 +32,7 @@ class MockSerial(object):
     self._rate = rate
 
   def read(self, n):
-    print("MockSerial.read()", file=sys.stderr)
+#    print("MockSerial.read()", file=sys.stderr)
     return "text line\r"
 
 
@@ -46,7 +46,7 @@ class ProbeSerialReader(object):
     self._ph = 0.00
     self._ec_port = MockSerial(ec_port, 9600)
     self._ph_port = MockSerial(ph_port, 9600)
-    self._serialPortsThread = threading.Thread(target=self._serialReader)
+    self._serialPortsThread = threading.Thread(target=self._runSerialReader)
     self._serialPortsThread.setDaemon(True)
     
   def measurements(self):
@@ -54,7 +54,7 @@ class ProbeSerialReader(object):
     return (self._ec, self._ph)
 
   def _readline(self, serialPort): # (*)
-      print("ProbeSerialReader._readline()", file=sys.stderr)
+#      print("ProbeSerialReader._readline()", file=sys.stderr)
       eol = b'\r'
       leneol = len(eol)
       line = bytearray()
@@ -68,8 +68,8 @@ class ProbeSerialReader(object):
               break
       return bytes(line)
 
-  def _serialReader(self):
-    print("ProbeSerialReader._serialReader()", file=sys.stderr)
+  def _runSerialReader(self):
+#    print("ProbeSerialReader._runSerialReader()", file=sys.stderr)
     while True:
         ec = self._readline(self._ec_port)
         ph = self._readline(self._ph_port)
@@ -78,8 +78,8 @@ class ProbeSerialReader(object):
         if ph:
             self._ph = ph
 
-  def Init(self):
-      print("ProbeSerialReader.Init()", file=sys.stderr)
+  def Start(self):
+      print("ProbeSerialReader.Start()", file=sys.stderr)
       self._serialPortsThread.start()
       #_serialPortsThread.join()
 
