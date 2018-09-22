@@ -1,8 +1,9 @@
 import sys
-import computer_board as ComputerBoard
-#import mock_computer_board as ComputerBoard
+#import computer_board as ComputerBoard
+import mock_computer_board as ComputerBoard
 from peristaltic_pump import PeristalticPump
 from water_pump import WaterPump
+from probes_module import ecPhProbes
 
 #Initialize board pins to be used by hardware components.
 ComputerBoard.Init()
@@ -23,6 +24,13 @@ water_pump_pin = 22
 
 water_pump = None #For cleaniness, this is set to an initial value during Init(). 
 
+  #EC and pH probes:
+ec_atlas_port = '/dev/serial0'
+ph_atlas_port = '/dev/ttyUSB0'
+
+probes = None #Thread is going to be started during Init().
+serialReader = ComputerBoard.ProbeSerialReader(ec_atlas_port, ph_atlas_port)
+
 #End of setup of hardware components #########################################
 
 #Initialize device manager:
@@ -40,8 +48,15 @@ def Init():
   water_pump = WaterPump() 
   ComputerBoard.InitializePinAsOutput(water_pump_pin)
   water_pump.Stop()
+  #Initialize EC and PH probes:
+  global probes
+  probes = ecPhProbes()
+  serialReader.Start()
+  probes.getMeasurements()
 
 #Auxiliary functions: ########################################################
+
+  #For peristaltic pumps:
 
 def StartPump(pump, dir_forward=True):
   if pump.name != 'WP':
@@ -70,11 +85,15 @@ def StopAllPumps():
   #Procedure for water pump:
   water_pump.Stop()
   
-
 def _PeristalticPinsFromName(pump_name):
     pin1 = peristaltic_pins[pump_name][0]
     pin2 = peristaltic_pins[pump_name][1]
     return pin1, pin2
+
+  #For EC and pH probes:
+
+def getMeasurements():
+  return serialReader.measurements()
 
 #End of auxiliary functions. ###################################################
 

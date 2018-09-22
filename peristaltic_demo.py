@@ -40,7 +40,7 @@ def main(argv):
       pump.Stop()
       print('Finishing up!')
     finally: #Freeing up resources is done through the device manager as it is the one that knows what pumps exist.
-      DeviceManager.CleanFinalize() #This ensures a clean exit.
+      DeviceManager.CleanFinalize() #This ensures a clean exit
       quit()
 
 if __name__ == "__main__":

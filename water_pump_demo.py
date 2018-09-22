@@ -22,9 +22,10 @@ def main():
       # If a keyboard interrupt is detected then it exits cleanly!
       pump.Stop()
       print('Finishing up!')
-    #finally: #Freeing up resources is done through the device manager as it is the one that knows what pumps exist.
-    # DeviceManager.CleanFinalize() #This ensures a clean exit.
+    finally: #Freeing up resources is done through the device manager as it is the one that knows what pumps exist.
+      DeviceManager.CleanFinalize() #This ensures a clean exit
       quit()
+      
 
 
 if __name__ == "__main__":
