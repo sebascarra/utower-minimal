@@ -4,6 +4,7 @@ import mock_computer_board as ComputerBoard
 from peristaltic_pump import PeristalticPump
 from water_pump import WaterPump
 from probes_module import EcPhProbes
+from probe_serial_reader import ProbeSerialReader
 
 
 #Initialize board pins to be used by hardware components.
@@ -30,7 +31,10 @@ EC_ATLAS_PORT = '/dev/serial0'
 PH_ATLAS_PORT = '/dev/ttyUSB0'
 
 probes = None #Thread is going to be started during Init().
-serial_reader = ComputerBoard.ProbeSerialReader(EC_ATLAS_PORT, PH_ATLAS_PORT)
+serial_reader = ProbeSerialReader(
+    ComputerBoard.create_serial(EC_ATLAS_PORT, 9600),
+    ComputerBoard.create_serial(PH_ATLAS_PORT, 9600)
+)
 
 #End of setup of hardware components #########################################
 
