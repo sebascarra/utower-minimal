@@ -1,17 +1,18 @@
-import sys
+"""Handles the device, acting as a proxy between the application and the computer board."""
 #import computer_board as ComputerBoard
 import mock_computer_board as ComputerBoard
 from peristaltic_pump import PeristalticPump
 from water_pump import WaterPump
-from probes_module import ecPhProbes
+from probes_module import EcPhProbes
+
 
 #Initialize board pins to be used by hardware components.
-ComputerBoard.Init()
+ComputerBoard.init()
 
 #Set up hardware components: #################################################
 
-  #Peristaltic pumps:
-peristaltic_pins = {
+#Peristaltic pumps:
+PERISTALTIC_PINS = {
     'P1': (18, 25),
     'P2': (27, 12),
     'P3': (16, 20)
@@ -19,87 +20,98 @@ peristaltic_pins = {
 
 peristaltic_pumps = {}
 
-  #Water pump:
-water_pump_pin = 22
+#Water pump:
+WATER_PUMP_PIN = 22
 
-water_pump = None #For cleaniness, this is set to an initial value during Init(). 
+water_pump = None #For cleaniness, this is set to an initial value during Init().
 
-  #EC and pH probes:
-ec_atlas_port = '/dev/serial0'
-ph_atlas_port = '/dev/ttyUSB0'
+#EC and pH probes:
+EC_ATLAS_PORT = '/dev/serial0'
+PH_ATLAS_PORT = '/dev/ttyUSB0'
 
 probes = None #Thread is going to be started during Init().
-serialReader = ComputerBoard.ProbeSerialReader(ec_atlas_port, ph_atlas_port)
+serial_reader = ComputerBoard.ProbeSerialReader(EC_ATLAS_PORT, PH_ATLAS_PORT)
 
 #End of setup of hardware components #########################################
 
-#Initialize device manager:
-def Init():
-  #Initialize peristaltic pumps:
-  for pump_name in peristaltic_pins:
-    pump = PeristalticPump(pump_name) 
-    peristaltic_pumps[pump_name] = pump # -> Why we don't need to use the "global" keyword here: https://stackoverflow.com/questions/14323817/global-dictionaries-dont-need-keyword-global-to-modify-them
-    pin1, pin2 = _PeristalticPinsFromName(pump_name)
-    ComputerBoard.InitializePinAsOutput(pin1)
-    ComputerBoard.InitializePinAsOutput(pin2)
-    pump.Stop()
-  #Initialize water pump:
-  global water_pump #See (*) at bottom.
-  water_pump = WaterPump() 
-  ComputerBoard.InitializePinAsOutput(water_pump_pin)
-  water_pump.Stop()
-  #Initialize EC and PH probes:
-  global probes
-  probes = ecPhProbes()
-  serialReader.Start()
-  probes.getMeasurements()
+def init():
+    """Initializes the device manager, creating the required objects."""
+    #Initialize peristaltic pumps:
+    for pump_name in PERISTALTIC_PINS:
+        pump = PeristalticPump(pump_name)
+        peristaltic_pumps[pump_name] = pump # -> Why we don't need to use the "global" keyword here: https://stackoverflow.com/questions/14323817/global-dictionaries-dont-need-keyword-global-to-modify-them
+        pin1, pin2 = _peristaltic_pins_from_name(pump_name)
+        ComputerBoard.initialize_pin_as_output(pin1)
+        ComputerBoard.initialize_pin_as_output(pin2)
+        pump.stop()
+    #Initialize water pump:
+    global water_pump #See (*) at bottom.
+    water_pump = WaterPump()
+    ComputerBoard.initialize_pin_as_output(WATER_PUMP_PIN)
+    water_pump.stop()
+    #Initialize EC and PH probes:
+    global probes
+    probes = EcPhProbes()
+    serial_reader.start()
+    probes.get_measurements()
 
 #Auxiliary functions: ########################################################
 
   #For peristaltic pumps:
 
-def StartPump(pump, dir_forward=True):
-  if pump.name != 'WP':
-    #Procedure for peristaltics:
-    pin1, pin2 = _PeristalticPinsFromName(pump.name)
-    ComputerBoard.SetOutputToPin(pin1, not dir_forward)
-    ComputerBoard.SetOutputToPin(pin2, dir_forward)
-    #Procedure for water pump:
-  else:
-    ComputerBoard.SetOutputToPin(water_pump_pin, True)
+def start_pump(pump, dir_forward=True):
+    """Starts a pump."""
+    if pump.name != 'WP':
+        #Procedure for peristaltics:
+        pin1, pin2 = _peristaltic_pins_from_name(pump.name)
+        ComputerBoard.set_output_to_pin(pin1, not dir_forward)
+        ComputerBoard.set_output_to_pin(pin2, dir_forward)
+        #Procedure for water pump:
+    else:
+        ComputerBoard.set_output_to_pin(WATER_PUMP_PIN, True)
 
-def StopPump(pump):
-  if pump.name != 'WP':
-    #Procedure for peristaltics:
-    pin1, pin2 = _PeristalticPinsFromName(pump.name)
-    ComputerBoard.SetOutputToPin(pin1, False)
-    ComputerBoard.SetOutputToPin(pin2, False)
-  else:
-    #Procedure for water pump:
-    ComputerBoard.SetOutputToPin(water_pump_pin, False)
 
-def StopAllPumps():
-  #Procedure for peristaltics:
-  for pump in peristaltic_pumps.values():
-    pump.Stop()
-  #Procedure for water pump:
-  water_pump.Stop()
-  
-def _PeristalticPinsFromName(pump_name):
-    pin1 = peristaltic_pins[pump_name][0]
-    pin2 = peristaltic_pins[pump_name][1]
+def stop_pump(pump):
+    """Stops a pump."""
+    if pump.name != 'WP':
+        #Procedure for peristaltics:
+        pin1, pin2 = _peristaltic_pins_from_name(pump.name)
+        ComputerBoard.set_output_to_pin(pin1, False)
+        ComputerBoard.set_output_to_pin(pin2, False)
+    else:
+        #Procedure for water pump:
+        ComputerBoard.set_output_to_pin(WATER_PUMP_PIN, False)
+
+
+def stop_all_pumps():
+    """Stops all the pumps in the device."""
+    #Procedure for peristaltics:
+    for pump in peristaltic_pumps.values():
+        pump.stop()
+    #Procedure for water pump:
+    water_pump.stop()
+
+
+def _peristaltic_pins_from_name(pump_name):
+    """Returs the pins corresponding to a pump."""
+    pin1 = PERISTALTIC_PINS[pump_name][0]
+    pin2 = PERISTALTIC_PINS[pump_name][1]
     return pin1, pin2
+
 
   #For EC and pH probes:
 
-def getMeasurements():
-  return serialReader.measurements()
+
+def get_measurements():
+    """Returns the EC and PH measurements."""
+    return serial_reader.measurements()
 
 #End of auxiliary functions. ###################################################
 
-#Clean up after exit.
-def CleanFinalize():
-  ComputerBoard.CleanFinalize()
+
+def clean_finalize():
+    """Performs required cleanup before exiting the application."""
+    ComputerBoard.clean_finalize()
 
 #(*):
 
