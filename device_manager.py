@@ -1,10 +1,11 @@
 """Handles the device, acting as a proxy between the application and the computer board."""
-#import computer_board as ComputerBoard
-import mock_computer_board as ComputerBoard
+import computer_board as ComputerBoard
+#import mock_computer_board as ComputerBoard
 from peristaltic_pump import PeristalticPump
 from water_pump import WaterPump
 from probes_module import EcPhProbes
 from probe_serial_reader import ProbeSerialReader
+from solenoid_valve import SolenoidValve
 
 
 #Initialize board pins to be used by hardware components.
@@ -36,6 +37,12 @@ serial_reader = ProbeSerialReader(
     ComputerBoard.create_serial(PH_ATLAS_PORT, 9600)
 )
 
+#Solenoid valve
+
+SOLENOID_VALVE_PIN = 17
+
+solenoid_valve = None #For cleaniness, this is set to an initial value during Init().
+
 #End of setup of hardware components #########################################
 
 def init():
@@ -58,6 +65,11 @@ def init():
     probes = EcPhProbes()
     serial_reader.start()
     probes.get_measurements()
+    #Initialize solenoid valve:
+    global solenoid_valve
+    solenoid_valve = SolenoidValve()
+    ComputerBoard.initialize_pin_as_output(SOLENOID_VALVE_PIN)
+    solenoid_valve.close()
 
 #Auxiliary functions: ########################################################
 
@@ -109,6 +121,17 @@ def _peristaltic_pins_from_name(pump_name):
 def get_measurements():
     """Returns the EC and PH measurements."""
     return serial_reader.measurements()
+
+
+  #For solenoid valve:
+
+def open_valve():
+    """Opens the solenoid valve in the device."""
+    ComputerBoard.set_output_to_pin(SOLENOID_VALVE_PIN, True)
+
+def close_valve():
+    """Shuts/closes the solenoid valve in the device."""
+    ComputerBoard.set_output_to_pin(SOLENOID_VALVE_PIN, False)
 
 #End of auxiliary functions. ###################################################
 
