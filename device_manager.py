@@ -8,6 +8,7 @@ from probe_serial_reader import ProbeSerialReader
 from solenoid_valve import SolenoidValve
 
 
+
 #Initialize board pins to be used by hardware components.
 ComputerBoard.init()
 
@@ -38,10 +39,23 @@ serial_reader = ProbeSerialReader(
 )
 
 #Solenoid valve
-
 SOLENOID_VALVE_PIN = 17
 
 solenoid_valve = None #For cleaniness, this is set to an initial value during Init().
+
+#Load cells:
+
+"""CELL_DT_PINS = (10, 5, 13, 26)"""
+"""CELL_SCK_PINS = (9, 6, 19, 21)"""
+
+CELL_PINS = {
+    'C1': (10, 9),
+    'C2': (5, 6),
+    'C3': (13, 19),
+    'C4': (26, 21)
+}
+
+hxs = []
 
 #End of setup of hardware components #########################################
 
@@ -70,6 +84,15 @@ def init():
     solenoid_valve = SolenoidValve()
     ComputerBoard.initialize_pin_as_output(SOLENOID_VALVE_PIN)
     solenoid_valve.close()
+    #Initialize load cells:
+    for cell_name in CELL_PINS:
+        hx = HX711(dtPins[i], sckPins[i])
+        hx.set_reading_format("LSB", "MSB")
+        #hx.set_reference_unit(113)
+        hx.reset()
+        hx.tare()
+        hxs.append(hx)
+        
 
 #Auxiliary functions: ########################################################
 
