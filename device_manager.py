@@ -6,7 +6,8 @@ from water_pump import WaterPump
 from probes_module import EcPhProbes
 from probe_serial_reader import ProbeSerialReader
 from solenoid_valve import SolenoidValve
-
+from load_cells import LoadCells
+from load_cells_reader import LoadCellsReader
 
 
 #Initialize board pins to be used by hardware components.
@@ -55,7 +56,8 @@ CELL_PINS = {
     'C4': (26, 21)
 }
 
-hxs = []
+load_cells = {}
+cells_reader = LoadCellsReader(calibration_factor=1)
 
 #End of setup of hardware components #########################################
 
@@ -75,10 +77,10 @@ def init():
     ComputerBoard.initialize_pin_as_output(WATER_PUMP_PIN)
     water_pump.stop()
     #Initialize EC and PH probes:
-    global probes
-    probes = EcPhProbes()
-    serial_reader.start()
-    probes.get_measurements()
+        #global probes
+        #probes = EcPhProbes()
+        #serial_reader.start()
+        #probes.get_measurements()
     #Initialize solenoid valve:
     global solenoid_valve
     solenoid_valve = SolenoidValve()
@@ -86,12 +88,11 @@ def init():
     solenoid_valve.close()
     #Initialize load cells:
     for cell_name in CELL_PINS:
-        hx = HX711(dtPins[i], sckPins[i])
-        hx.set_reading_format("LSB", "MSB")
-        #hx.set_reference_unit(113)
-        hx.reset()
-        hx.tare()
-        hxs.append(hx)
+        dt_pin, sck_pin = _load_cell_pins_from_name(cell_name)
+        hx = ComputerBoard.initialize_cell_in_pins(dt_pin, sck_pin)
+        load_cells[cell_name] = hx
+    cells_reader.configure_thread(load_cells)
+    cells_reader.start()
         
 
 #Auxiliary functions: ########################################################
@@ -155,6 +156,15 @@ def open_valve():
 def close_valve():
     """Shuts/closes the solenoid valve in the device."""
     ComputerBoard.set_output_to_pin(SOLENOID_VALVE_PIN, False)
+
+  #For load cells:
+
+def _load_cell_pins_from_name(cell_name):
+    """Returs the pins corresponding to a load cell."""
+    dt_pin = CELL_PINS[cell_name][0]
+    sck_pin = CELL_PINS[cell_name][1]
+    return dt_pin, sck_pin
+
 
 #End of auxiliary functions. ###################################################
 

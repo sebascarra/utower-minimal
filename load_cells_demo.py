@@ -1,34 +1,34 @@
 #!/usr/bin/env python
-"""Contains a sample that tests the EC and PH probes."""
+"""Contains a sample that tests the load cells."""
 from __future__ import print_function
 from time import sleep
 import device_manager as DeviceManager
 
 
 def main():
-    """Prints the measurements from the EC and PH probes to stdout."""
+    """Prints the weight measured by the group of load cells to stdout."""
 
-    # First initialize the device manager. This is mandatory to use any of the available
-    # probes. Probe objects are created during the initialization of the DeviceManager.
+    # First initialize the device manager. This is mandatory to use the group of load cells.
+    # A load cell group object is created during the initialization of the DeviceManager.
     DeviceManager.init()
 
-    probes = DeviceManager.probes
+    cells = DeviceManager.load_cells
 
-    # From this point on we use exclusively functions inside the probe class,
+    # From this point on we use exclusively functions inside the LoadCells class,
     # NOT the DeviceManager module.
 
-    print('Displaying probe measurements...')
+    print('Displaying weight measurements...')
 
     try:
         while True:
-            print("measurements: ", probes.get_measurements())
-            sleep(4)
+            print("measurements: ", cells.get_weight_measurement())
+            sleep(2)
     except KeyboardInterrupt:
         # If a keyboard interrupt is detected then it exits cleanly!
         print('Finishing up!')
     finally:
         # Freeing up resources is done through the device manager as it is the one that knows
-        # what pumps exist.
+        # if the group of load cells exists.
         DeviceManager.clean_finalize() # This ensures a clean exit
         quit()
 
