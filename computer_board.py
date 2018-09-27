@@ -2,6 +2,7 @@
 import serial
 import RPi.GPIO as GPIO
 from hx711 import HX711
+from time import sleep
 
 
 def init():
@@ -34,8 +35,10 @@ def create_serial(port, rate):
 def initialize_cell_in_pins(dt_pin, sck_pin):
     hx = HX711(dt_pin, sck_pin)
     hx.set_reading_format("LSB", "MSB")
-    #hx.set_reference_unit(113)
-    hx.reset()
+    hx.power_down()
+    sleep(1) #Such long delays are added because of a 400 ms establishing time specified by the datasheet of the HX711.
+    hx.power_up()
+    sleep(1)
     hx.tare()
     return hx
 

@@ -56,8 +56,11 @@ CELL_PINS = {
     'C4': (26, 21)
 }
 
-load_cells = {}
-cells_reader = LoadCellsReader(calibration_factor=1)
+CALIBRATION_FACT0R = 190
+
+load_cells = []
+load_cells_object = None #For cleaniness, this is set to an initial value during Init().
+cells_reader = LoadCellsReader(CALIBRATION_FACT0R)
 
 #End of setup of hardware components #########################################
 
@@ -90,9 +93,11 @@ def init():
     for cell_name in CELL_PINS:
         dt_pin, sck_pin = _load_cell_pins_from_name(cell_name)
         hx = ComputerBoard.initialize_cell_in_pins(dt_pin, sck_pin)
-        load_cells[cell_name] = hx
+        load_cells.append(hx)
     cells_reader.configure_thread(load_cells)
     cells_reader.start()
+    global load_cells_object
+    load_cells_object = LoadCells()
         
 
 #Auxiliary functions: ########################################################
@@ -164,6 +169,10 @@ def _load_cell_pins_from_name(cell_name):
     dt_pin = CELL_PINS[cell_name][0]
     sck_pin = CELL_PINS[cell_name][1]
     return dt_pin, sck_pin
+
+def get_weight_measurement():
+    """Returns the load cell weight measurements."""
+    return cells_reader.weight_measurement()
 
 
 #End of auxiliary functions. ###################################################
