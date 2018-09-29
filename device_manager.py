@@ -8,6 +8,7 @@ from probe_serial_reader import ProbeSerialReader
 from solenoid_valve import SolenoidValve
 from load_cells import LoadCells
 from load_cells_reader import LoadCellsReader
+from stepper_motor import StepperMotor
 
 
 #Initialize board pins to be used by hardware components.
@@ -49,7 +50,7 @@ solenoid_valve = None #For cleaniness, this is set to an initial value during In
 """CELL_DT_PINS = (10, 5, 13, 26)"""
 """CELL_SCK_PINS = (9, 6, 19, 21)"""
 
-ADC_PINS = (10, 9)
+ADC_PINS = (10, 9) #DT, SCK
 
 CALIBRATION_FACT0R = 1
 
@@ -57,10 +58,18 @@ adc = None #For cleaniness, this is set to an initial value during Init().
 load_cells_object = None #For cleaniness, this is set to an initial value during Init().
 cells_reader = LoadCellsReader(CALIBRATION_FACT0R)
 
+#Stepper motor:
+
+STEPPER_PINS = (23, 24) #STEP, DIR
+
+stepper = None
+
 #End of setup of hardware components #########################################
 
 def init():
     """Initializes the device manager, creating the required objects."""
+    #Initialize the computer board:
+    ComputerBoard.init()
     #Initialize peristaltic pumps:
     for pump_name in PERISTALTIC_PINS:
         pump = PeristalticPump(pump_name)
@@ -92,6 +101,11 @@ def init():
     cells_reader.start()
     global load_cells_object
     load_cells_object = LoadCells()
+    #Initialize stepper motor:
+    global stepper
+    stepper = StepperMotor()
+    stepper.stop()
+
         
 
 #Auxiliary functions: ########################################################
@@ -167,6 +181,19 @@ def _adc_pins_from_name():
 def get_weight_measurement():
     """Returns the load cell weight measurements."""
     return cells_reader.weight_measurement()
+
+
+  #For stepper motor:
+
+def start_motor(direction, steps_per_second=100):
+    """Starts the stepper motor."""
+    ComputerBoard.set_output_to_pin_pigpio(STEPPER_PINS[1], direction) #Set stepper direction.
+    ComputerBoard.set_pwm_on(STEPPER_PINS[0], steps_per_second) #Set stepper steps per second.
+
+
+def stop_motor():
+    """Stops the stepper motor."""
+    ComputerBoard.set_pwm_off(STEPPER_PINS[0]) #Set stepper steps per second to zero.
 
 
 #End of auxiliary functions. ###################################################
