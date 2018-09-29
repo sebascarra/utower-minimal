@@ -1,10 +1,13 @@
 """Handles the device, acting as a proxy between the application and the computer board."""
-#import computer_board as ComputerBoard
-import mock_computer_board as ComputerBoard
+import computer_board as ComputerBoard
+#import mock_computer_board as ComputerBoard
 from peristaltic_pump import PeristalticPump
 from water_pump import WaterPump
 from probes_module import EcPhProbes
 from probe_serial_reader import ProbeSerialReader
+from solenoid_valve import SolenoidValve
+from load_cells import LoadCells
+from load_cells_reader import LoadCellsReader
 
 
 #Initialize board pins to be used by hardware components.
@@ -36,6 +39,24 @@ serial_reader = ProbeSerialReader(
     ComputerBoard.create_serial(PH_ATLAS_PORT, 9600)
 )
 
+#Solenoid valve
+SOLENOID_VALVE_PIN = 17
+
+solenoid_valve = None #For cleaniness, this is set to an initial value during Init().
+
+#Load cells:
+
+"""CELL_DT_PINS = (10, 5, 13, 26)"""
+"""CELL_SCK_PINS = (9, 6, 19, 21)"""
+
+ADC_PINS = (10, 9)
+
+CALIBRATION_FACT0R = 1
+
+adc = None #For cleaniness, this is set to an initial value during Init().
+load_cells_object = None #For cleaniness, this is set to an initial value during Init().
+cells_reader = LoadCellsReader(CALIBRATION_FACT0R)
+
 #End of setup of hardware components #########################################
 
 def init():
@@ -54,10 +75,24 @@ def init():
     ComputerBoard.initialize_pin_as_output(WATER_PUMP_PIN)
     water_pump.stop()
     #Initialize EC and PH probes:
-    global probes
-    probes = EcPhProbes()
-    serial_reader.start()
-    probes.get_measurements()
+        #global probes
+        #probes = EcPhProbes()
+        #serial_reader.start()
+        #probes.get_measurements()
+    #Initialize solenoid valve:
+    global solenoid_valve
+    solenoid_valve = SolenoidValve()
+    ComputerBoard.initialize_pin_as_output(SOLENOID_VALVE_PIN)
+    solenoid_valve.close()
+    #Initialize load cells:
+    dt_pin, sck_pin = _adc_pins_from_name()
+    global adc
+    adc = ComputerBoard.initialize_adc_in_pins(dt_pin, sck_pin)
+    cells_reader.configure_thread(adc)
+    cells_reader.start()
+    global load_cells_object
+    load_cells_object = LoadCells()
+        
 
 #Auxiliary functions: ########################################################
 
@@ -109,6 +144,30 @@ def _peristaltic_pins_from_name(pump_name):
 def get_measurements():
     """Returns the EC and PH measurements."""
     return serial_reader.measurements()
+
+
+  #For solenoid valve:
+
+def open_valve():
+    """Opens the solenoid valve in the device."""
+    ComputerBoard.set_output_to_pin(SOLENOID_VALVE_PIN, True)
+
+def close_valve():
+    """Shuts/closes the solenoid valve in the device."""
+    ComputerBoard.set_output_to_pin(SOLENOID_VALVE_PIN, False)
+
+  #For load cells:
+
+def _adc_pins_from_name():
+    """Returs the pins corresponding to a load cell ADC."""
+    dt_pin = ADC_PINS[0]
+    sck_pin = ADC_PINS[1]
+    return dt_pin, sck_pin
+
+def get_weight_measurement():
+    """Returns the load cell weight measurements."""
+    return cells_reader.weight_measurement()
+
 
 #End of auxiliary functions. ###################################################
 

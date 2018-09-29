@@ -1,5 +1,6 @@
 """Contains all code that interacts directly with the computer board hardware."""
 from __future__ import print_function
+from time import sleep
 import sys
 
 
@@ -30,11 +31,11 @@ def clean_finalize():
         'GPIO.cleanup()'
     )
 
+#For EC and pH probes:
 
 def create_serial(port, rate):
     """Creates a new Serial object at the given port with the given rate."""
     return MockSerial(port, rate)
-
 
 class MockSerial(object):
     """Mocks the Serial class."""
@@ -50,3 +51,36 @@ class MockSerial(object):
 #        print("MockSerial.read()", file=sys.stderr)
         return "0.0\r"
 
+#For load cells:
+
+def initialize_cell_in_pins(dt_pin, sck_pin):
+    print(
+        'hx = HX711({dt_pin}}, {sck_pin})'
+        .format(dt_pin=dt_pin, sck_pin=sck_pin)
+    )
+
+    hx = MockHX711(dt_pin, sck_pin)
+    return hx
+
+class MockHX711(object):
+    """Mocks the HX711 class."""
+
+    def __init__(self, dt_pin, sck_pin):
+        print("HX711.__init__()", file=sys.stderr)
+        self._dt_pin = dt_pin
+        self._sck_pin = sck_pin
+
+    @staticmethod
+    def get_weight(_):
+        """Mocks the HX711 get_weight function."""
+        return "123"
+
+    @staticmethod
+    def power_down(_):
+        """Mocks the HX711 power_down function."""
+        sleep(0.5)
+
+    @staticmethod
+    def power_up(_):
+        """Mocks the HX711 power_up function."""
+        sleep(0.5)

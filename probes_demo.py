@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Conatins a sample that tests the EC and PH probes."""
+"""Contains a sample that tests the EC and PH probes."""
 from __future__ import print_function
 from time import sleep
 import device_manager as DeviceManager
