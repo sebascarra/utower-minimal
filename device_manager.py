@@ -49,16 +49,11 @@ solenoid_valve = None #For cleaniness, this is set to an initial value during In
 """CELL_DT_PINS = (10, 5, 13, 26)"""
 """CELL_SCK_PINS = (9, 6, 19, 21)"""
 
-CELL_PINS = {
-    'C1': (10, 9),
-    'C2': (5, 6),
-    'C3': (13, 19),
-    'C4': (26, 21)
-}
+ADC_PINS = (10, 9)
 
-CALIBRATION_FACT0R = 190
+CALIBRATION_FACT0R = 1
 
-load_cells = []
+adc = None #For cleaniness, this is set to an initial value during Init().
 load_cells_object = None #For cleaniness, this is set to an initial value during Init().
 cells_reader = LoadCellsReader(CALIBRATION_FACT0R)
 
@@ -90,11 +85,10 @@ def init():
     ComputerBoard.initialize_pin_as_output(SOLENOID_VALVE_PIN)
     solenoid_valve.close()
     #Initialize load cells:
-    for cell_name in CELL_PINS:
-        dt_pin, sck_pin = _load_cell_pins_from_name(cell_name)
-        hx = ComputerBoard.initialize_cell_in_pins(dt_pin, sck_pin)
-        load_cells.append(hx)
-    cells_reader.configure_thread(load_cells)
+    dt_pin, sck_pin = _adc_pins_from_name()
+    global adc
+    adc = ComputerBoard.initialize_adc_in_pins(dt_pin, sck_pin)
+    cells_reader.configure_thread(adc)
     cells_reader.start()
     global load_cells_object
     load_cells_object = LoadCells()
@@ -164,10 +158,10 @@ def close_valve():
 
   #For load cells:
 
-def _load_cell_pins_from_name(cell_name):
-    """Returs the pins corresponding to a load cell."""
-    dt_pin = CELL_PINS[cell_name][0]
-    sck_pin = CELL_PINS[cell_name][1]
+def _adc_pins_from_name():
+    """Returs the pins corresponding to a load cell ADC."""
+    dt_pin = ADC_PINS[0]
+    sck_pin = ADC_PINS[1]
     return dt_pin, sck_pin
 
 def get_weight_measurement():

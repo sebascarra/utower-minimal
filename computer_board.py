@@ -32,7 +32,7 @@ def create_serial(port, rate):
 
 #For load cells:
 
-def initialize_cell_in_pins(dt_pin, sck_pin):
+def initialize_adc_in_pins(dt_pin, sck_pin):
     hx = HX711(dt_pin, sck_pin)
     hx.set_reading_format("LSB", "MSB")
     hx.power_down()
