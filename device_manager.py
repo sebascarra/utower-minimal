@@ -9,7 +9,8 @@ from solenoid_valve import SolenoidValve
 from load_cells import LoadCells
 from load_cells_reader import LoadCellsReader
 from stepper_motor import StepperMotor
-
+from water_thermometer import WaterThermometer
+from water_thermometer_reader import WaterThermometerReader
 
 #Initialize board pins to be used by hardware components.
 ComputerBoard.init()
@@ -47,9 +48,6 @@ solenoid_valve = None #For cleaniness, this is set to an initial value during In
 
 #Load cells:
 
-"""CELL_DT_PINS = (10, 5, 13, 26)"""
-"""CELL_SCK_PINS = (9, 6, 19, 21)"""
-
 ADC_PINS = (10, 9) #DT, SCK
 
 CALIBRATION_FACT0R = 1
@@ -62,7 +60,14 @@ cells_reader = LoadCellsReader(CALIBRATION_FACT0R)
 
 STEPPER_PINS = (23, 24) #STEP, DIR
 
-stepper = None
+stepper = None #For cleaniness, this is set to an initial value during Init().
+
+#DS18B20 water thermometer:
+
+DS18B20_PIN = 4
+
+water_thermometer = None #For cleaniness, this is set to an initial value during Init().
+water_thermometer_reader = WaterThermometerReader()
 
 #End of setup of hardware components #########################################
 
@@ -105,8 +110,14 @@ def init():
     global stepper
     stepper = StepperMotor()
     stepper.stop()
+    #Initialize DS18B20
+    ComputerBoard.initialize_pin_as_input_with_pull_up(DS18B20_PIN)
+    ds18b20_object = ComputerBoard.DS18B20()
+    water_thermometer_reader.configure_thread(ds18b20_object)
+    water_thermometer_reader.start()
+    global water_thermometer
+    water_thermometer = WaterThermometer()
 
-        
 
 #Auxiliary functions: ########################################################
 
@@ -195,6 +206,12 @@ def stop_motor():
     """Stops the stepper motor."""
     ComputerBoard.set_pwm_off(STEPPER_PINS[0]) #Set stepper steps per second to zero.
 
+
+  #For water thermometer:
+
+def get_temperature_measurement():
+    return water_thermometer_reader.temp_measurement()
+    
 
 #End of auxiliary functions. ###################################################
 

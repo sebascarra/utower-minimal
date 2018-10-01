@@ -5,6 +5,7 @@ from hx711 import HX711
 from time import sleep
 import pigpio
 import os
+import glob
 
 pi = None #This will be set during initialization.
 
@@ -28,6 +29,10 @@ def set_output_to_pin_pigpio(pin_number, state):
 def initialize_pin_as_output(pin_number):
     """Sets the given pin number as an output for a pin that runs using RPi.GPIO."""
     GPIO.setup(pin_number, GPIO.OUT)
+
+def initialize_pin_as_input_with_pull_up(pin_number):
+    """Sets the given pin number as an input, along with an internal pull-up resistor, for a pin that runs using RPi.GPIO."""
+    GPIO.setup(pin_number, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 def initialize_pin_as_output_pigpio(pin_number):
     """Sets the given pin number as an output for a pin that runs using pigpio."""
@@ -73,5 +78,35 @@ def set_pwm_on(pin, frequency=100, duty_cycle=128):
 def set_pwm_off(pin):
     pi.set_PWM_dutycycle(pin, 0)
 
+#For DS18B20 thermometer sensor:
     
+class DS18B20(object):
+
+    def __init__(self):
+        os.system('modprobe w1-gpio')
+        os.system('modprobe w1-therm')
+        self._base_dir = '/sys/bus/w1/devices/'
+        self._device_folder = glob.glob(self._base_dir + '28*')[0]
+        self._device_file = self._device_folder + '/w1_slave'
+    
+    def _read_temp_raw(self):
+        f = open(self._device_file, 'r')
+        lines = f.readlines()
+        f.close()
+        return lines
+ 
+    def read_temp(self):
+        lines = self._read_temp_raw()
+        while lines[0].strip()[-3:] != 'YES':
+            sleep(0.2)
+            lines = self._read_temp_raw()
+        equals_pos = lines[1].find('t=')
+        if equals_pos != -1:
+            temp_string = lines[1][equals_pos+2:]
+            temp_c = float(temp_string) / 1000.0
+            temp_f = temp_c * 9.0 / 5.0 + 32.0
+            #return temp_c, temp_f
+            return temp_c
+
+
 
