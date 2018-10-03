@@ -1,21 +1,11 @@
 """Handles the device, acting as a proxy between the application and the computer board."""
 import computer_board as ComputerBoard
 #import mock_computer_board as ComputerBoard
-from peristaltic_pump import PeristalticPump
-from water_pump import WaterPump
-from probes_module import EcPhProbes
-from probe_serial_reader import ProbeSerialReader
-from solenoid_valve import SolenoidValve
-from load_cells import LoadCells
-from load_cells_reader import LoadCellsReader
-from stepper_motor import StepperMotor
-from water_thermometer import WaterThermometer
-from water_thermometer_reader import WaterThermometerReader
 
-#Initialize board pins to be used by hardware components.
-ComputerBoard.init()
+
 
 #Set up hardware components: #################################################
+
 
 #Peristaltic pumps:
 PERISTALTIC_PINS = {
@@ -32,14 +22,14 @@ WATER_PUMP_PIN = 22
 water_pump = None #For cleaniness, this is set to an initial value during Init().
 
 #EC and pH probes:
-EC_ATLAS_PORT = '/dev/serial0'
-PH_ATLAS_PORT = '/dev/ttyUSB0'
+#EC_ATLAS_PORT = '/dev/serial0'
+#PH_ATLAS_PORT = '/dev/ttyUSB0'
 
-probes = None #Thread is going to be started during Init().
-serial_reader = ProbeSerialReader(
-    ComputerBoard.create_serial(EC_ATLAS_PORT, 9600),
-    ComputerBoard.create_serial(PH_ATLAS_PORT, 9600)
-)
+# probes = None #Thread is going to be started during Init().
+# serial_reader = ProbeSerialReader(
+#     ComputerBoard.create_serial(EC_ATLAS_PORT, 9600),
+#     ComputerBoard.create_serial(PH_ATLAS_PORT, 9600)
+# )
 
 #Solenoid valve
 SOLENOID_VALVE_PIN = 17
@@ -47,76 +37,96 @@ SOLENOID_VALVE_PIN = 17
 solenoid_valve = None #For cleaniness, this is set to an initial value during Init().
 
 #Load cells:
-
 ADC_PINS = (10, 9) #DT, SCK
 
 CALIBRATION_FACT0R = 1
 
 adc = None #For cleaniness, this is set to an initial value during Init().
 load_cells_object = None #For cleaniness, this is set to an initial value during Init().
-cells_reader = LoadCellsReader(CALIBRATION_FACT0R)
+cells_reader = None
 
 #Stepper motor:
-
 STEPPER_PINS = (23, 24) #STEP, DIR
 
 stepper = None #For cleaniness, this is set to an initial value during Init().
 
 #DS18B20 water thermometer:
 
-DS18B20_PIN = 4
+# DS18B20_PIN = 4
 
-water_thermometer = None #For cleaniness, this is set to an initial value during Init().
-water_thermometer_reader = WaterThermometerReader()
+# water_thermometer = None #For cleaniness, this is set to an initial value during Init().
+# water_thermometer_reader = WaterThermometerReader()
 
 #End of setup of hardware components #########################################
 
-def init():
+def init(device):
     """Initializes the device manager, creating the required objects."""
-    #Initialize the computer board:
+    if (device == "peristaltic_pump"):
+        from peristaltic_pump import PeristalticPump
+    if (device == "water_pump"):
+        from water_pump import WaterPump
+    #from probes_module import EcPhProbes
+    #from probe_serial_reader import ProbeSerialReader
+    if (device == "solenoid_valve"):
+        from solenoid_valve import SolenoidValve
+    if (device == "load_cells"):
+        from load_cells import LoadCells
+        from load_cells_reader import LoadCellsReader
+    if (device == "stepper_motor"):
+        from stepper_motor import StepperMotor
+    #from water_thermometer import WaterThermometer
+    #from water_thermometer_reader import WaterThermometerReader
+    #Initialize board pins to be used by hardware components.
     ComputerBoard.init()
     #Initialize peristaltic pumps:
-    for pump_name in PERISTALTIC_PINS:
-        pump = PeristalticPump(pump_name)
-        peristaltic_pumps[pump_name] = pump # -> Why we don't need to use the "global" keyword here: https://stackoverflow.com/questions/14323817/global-dictionaries-dont-need-keyword-global-to-modify-them
-        pin1, pin2 = _peristaltic_pins_from_name(pump_name)
-        ComputerBoard.initialize_pin_as_output(pin1)
-        ComputerBoard.initialize_pin_as_output(pin2)
-        pump.stop()
+    if (device == "peristaltic_pump"):
+        for pump_name in PERISTALTIC_PINS:
+            pump = PeristalticPump(pump_name)
+            peristaltic_pumps[pump_name] = pump # -> Why we don't need to use the "global" keyword here: https://stackoverflow.com/questions/14323817/global-dictionaries-dont-need-keyword-global-to-modify-them
+            pin1, pin2 = _peristaltic_pins_from_name(pump_name)
+            ComputerBoard.initialize_pin_as_output(pin1)
+            ComputerBoard.initialize_pin_as_output(pin2)
+            pump.stop()
     #Initialize water pump:
-    global water_pump #See (*) at bottom.
-    water_pump = WaterPump()
-    ComputerBoard.initialize_pin_as_output(WATER_PUMP_PIN)
-    water_pump.stop()
+    if (device == "water_pump"):
+        global water_pump #See (*) at bottom.
+        water_pump = WaterPump()
+        ComputerBoard.initialize_pin_as_output(WATER_PUMP_PIN)
+        water_pump.stop()
     #Initialize EC and PH probes:
-        #global probes
-        #probes = EcPhProbes()
-        #serial_reader.start()
-        #probes.get_measurements()
+    # global probes
+    # probes = EcPhProbes()
+    # serial_reader.start()
+    # probes.get_measurements()
     #Initialize solenoid valve:
-    global solenoid_valve
-    solenoid_valve = SolenoidValve()
-    ComputerBoard.initialize_pin_as_output(SOLENOID_VALVE_PIN)
-    solenoid_valve.close()
+    if (device == "solenoid_valve"):
+        global solenoid_valve
+        solenoid_valve = SolenoidValve()
+        ComputerBoard.initialize_pin_as_output(SOLENOID_VALVE_PIN)
+        solenoid_valve.close()
     #Initialize load cells:
-    dt_pin, sck_pin = _adc_pins_from_name()
-    global adc
-    adc = ComputerBoard.initialize_adc_in_pins(dt_pin, sck_pin)
-    cells_reader.configure_thread(adc)
-    cells_reader.start()
-    global load_cells_object
-    load_cells_object = LoadCells()
+    if (device == "load_cells"):
+        global cells_reader
+        cells_reader = LoadCellsReader(CALIBRATION_FACT0R)
+        dt_pin, sck_pin = _adc_pins_from_name()
+        global adc
+        adc = ComputerBoard.initialize_adc_in_pins(dt_pin, sck_pin)
+        cells_reader.configure_thread(adc)
+        cells_reader.start()
+        global load_cells_object
+        load_cells_object = LoadCells()
     #Initialize stepper motor:
-    global stepper
-    stepper = StepperMotor()
-    stepper.stop()
+    if (device == "stepper_motor"):
+        global stepper
+        stepper = StepperMotor()
+        stepper.stop()
     #Initialize DS18B20
-    ComputerBoard.initialize_pin_as_input_with_pull_up(DS18B20_PIN)
-    ds18b20_object = ComputerBoard.DS18B20()
-    water_thermometer_reader.configure_thread(ds18b20_object)
-    water_thermometer_reader.start()
-    global water_thermometer
-    water_thermometer = WaterThermometer()
+    # ComputerBoard.initialize_pin_as_input_with_pull_up(DS18B20_PIN)
+    # ds18b20_object = ComputerBoard.DS18B20()
+    # water_thermometer_reader.configure_thread(ds18b20_object)
+    # water_thermometer_reader.start()
+    # global water_thermometer
+    # water_thermometer = WaterThermometer()
 
 
 #Auxiliary functions: ########################################################
@@ -196,7 +206,7 @@ def get_weight_measurement():
 
   #For stepper motor:
 
-def start_motor(direction, steps_per_second=100):
+def start_motor(direction, steps_per_second=1600):
     """Starts the stepper motor."""
     ComputerBoard.set_output_to_pin_pigpio(STEPPER_PINS[1], direction) #Set stepper direction.
     ComputerBoard.set_pwm_on(STEPPER_PINS[0], steps_per_second) #Set stepper steps per second.

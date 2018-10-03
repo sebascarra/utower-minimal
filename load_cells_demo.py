@@ -10,7 +10,9 @@ def main():
    
     # First initialize the device manager. This is mandatory to use the group of load cells.
     # A load cell group object is created during the initialization of the DeviceManager.
-    DeviceManager.init()
+    DeviceManager.init("load_cells")
+
+    valve = DeviceManager.solenoid_valve
 
     cells = DeviceManager.load_cells_object
 
@@ -22,7 +24,7 @@ def main():
     try:
         while True:
             print("Weight: ", str(cells.get_weight_measurement()))
-            sleep(3)
+            sleep(2)
     except KeyboardInterrupt:
         # If a keyboard interrupt is detected then it exits cleanly!
         print('Finishing up!')

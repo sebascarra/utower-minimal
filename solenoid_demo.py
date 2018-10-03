@@ -7,7 +7,7 @@ import device_manager as DeviceManager
 
 def main():
     # First initialize the device manager.
-    DeviceManager.init()
+    DeviceManager.init("solenoid_valve")
 
     valve = DeviceManager.solenoid_valve
 

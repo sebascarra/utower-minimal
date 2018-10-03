@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Conatins a sample that tests the peristaltic pumps."""
+"""Contains a sample that tests the peristaltic pumps."""
 from __future__ import print_function
 import sys
 from time import sleep
@@ -24,7 +24,7 @@ def main(argv):
 
     # First initialize the device manager. This is mandatory to use any of the available
     # peristaltic pumps. Pump objects are created during the initialization of the DeviceManager.
-    DeviceManager.init()
+    DeviceManager.init("peristaltic_pump")
 
     # The name of the pump to be tested is received as an argument.
     pump_name = argv[1]
@@ -42,15 +42,18 @@ def main(argv):
     print('Starting motor sequence!')
 
     try:
-        while True:
-            pump.start()
-            sleep(3)
-            pump.stop()
-            sleep(1)
-            pump.start()
-            sleep(3)
-            pump.stop()
-            sleep(1)
+        pump.start(True)
+	while True:
+		pass
+        #while True:
+        #    pump.start()
+        #    sleep(3)
+        #    pump.stop()
+        #    sleep(1)
+        #    pump.start()
+        #    sleep(3)
+        #    pump.stop()
+        #    sleep(1)
     except KeyboardInterrupt:
         # If a keyboard interrupt is detected then it exits cleanly!
         pump.stop()
@@ -59,7 +62,7 @@ def main(argv):
         # Freeing up resources is done through the device manager as it is the one that knows
         # what pumps exist.
         DeviceManager.clean_finalize() # This ensures a clean exit
-        quit()
+        #quit()
 
 if __name__ == "__main__":
     main(sys.argv)

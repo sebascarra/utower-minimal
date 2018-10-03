@@ -9,7 +9,7 @@ def main():
 
     # First initialize the device manager. This is mandatory to use any of the available
     # probes. Probe objects are created during the initialization of the DeviceManager.
-    DeviceManager.init()
+    DeviceManager.init("water_pump")
 
     pump = DeviceManager.water_pump
 

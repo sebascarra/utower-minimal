@@ -4,6 +4,8 @@ from __future__ import print_function
 import sys
 from time import sleep
 import device_manager as DeviceManager
+import signal
+signal.signal(signal.SIGINT, signal.default_int_handler)
 
 
 def main(argv):
@@ -11,7 +13,7 @@ def main(argv):
 
     # First initialize the device manager. This is mandatory to use the stepper motor.
     # A stepper motor object is created during the initialization of the DeviceManager.
-    DeviceManager.init()
+    DeviceManager.init("stepper_motor")
 
     stepper = DeviceManager.stepper
 

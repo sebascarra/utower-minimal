@@ -22,7 +22,7 @@ def main():
     try:
         while True:
             print("measurements: ", probes.get_measurements())
-            sleep(4)
+            sleep(1)
     except KeyboardInterrupt:
         # If a keyboard interrupt is detected then it exits cleanly!
         print('Finishing up!')
@@ -30,7 +30,7 @@ def main():
         # Freeing up resources is done through the device manager as it is the one that knows
         # what pumps exist.
         DeviceManager.clean_finalize() # This ensures a clean exit
-        quit()
+        #quit()
 
 
 if __name__ == "__main__":
