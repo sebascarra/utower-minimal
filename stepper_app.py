@@ -4,8 +4,6 @@ from __future__ import print_function
 import sys
 from time import sleep
 import device_manager as DeviceManager
-import signal
-signal.signal(signal.SIGINT, signal.default_int_handler)
 
 
 def main(argv):
@@ -17,24 +15,16 @@ def main(argv):
 
     stepper = DeviceManager.stepper
 
+    mode = argv[1]
+
     # From this point on we use exclusively functions inside the StepperMotor class,
     # NOT the DeviceManager module.
 
-    print('Starting stepper motor')
-
-    try:
-        stepper.start(dir_forward=False)
-        while True:
-            pass
-    except KeyboardInterrupt:
-        # If a keyboard interrupt is detected then it exits cleanly!
+    if (mode == "start"):
+        stepper.start(dir_forward=True)
+    elif (mode == "stop"):
         stepper.stop()
-        print('Finishing up!')
-    finally:
-        # Freeing up resources is done through the device manager as it is the one that knows
-        # what pumps exist.
         DeviceManager.clean_finalize() # This ensures a clean exit
-        #quit()
 
 if __name__ == "__main__":
     main(sys.argv)
