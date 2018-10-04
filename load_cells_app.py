@@ -12,22 +12,17 @@ def main():
     # A load cell group object is created during the initialization of the DeviceManager.
     DeviceManager.init("load_cells")
 
-    valve = DeviceManager.solenoid_valve
-
     cells = DeviceManager.load_cells_object
 
     # From this point on we use exclusively functions inside the LoadCells class,
-    # NOT the DeviceManager module.
-
-    print('Displaying weight measurements...')
+    # NOT the DeviceManager module.top
 
     try:
         while True:
-            print("Weight: ", str(cells.get_weight_measurement()))
-            sleep(2)
-    except KeyboardInterrupt:
-        # If a keyboard interrupt is detected then it exits cleanly!
-        print('Finishing up!')
+            #Sleep both here and in the thread loop result in better CPU usage than just putting "pass" in the main while loop.
+            sleep(0.2)
+            #print(str(cells.get_weight_measurement() / 1))
+            #sleep(0.5)
     finally:
         # Freeing up resources is done through the device manager as it is the one that knows
         # if the group of load cells exists.

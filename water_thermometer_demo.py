@@ -10,7 +10,7 @@ def main():
    
     # First initialize the device manager. This is mandatory to use the water thermometer.
     # A water thermometer object is created during the initialization of the DeviceManager.
-    DeviceManager.init()
+    DeviceManager.init("water_thermometer")
 
     water_thermometer = DeviceManager.water_thermometer
 

@@ -1,6 +1,7 @@
 """Defines the LoadCellsReader class."""
 import threading
 import device_manager as DeviceManager
+from time import sleep
 
 class LoadCellsReader(object):
     """Handles interaction with the load cells using a unique amplifier+ADC."""
@@ -26,8 +27,11 @@ class LoadCellsReader(object):
         """Method that will be executed in every thread loop."""
         while True:
             self._adc_output = cells.get_weight(5) #5 is the amount of measurements that are averaged. The library has a default of 3.
-            #print(str(self._adc_output))
-            self._weight_gr = self._adc_output / self._calibration_factor #It is important to keep track of true weight at this point so that weight measurements from different times, or old, are not added together.
+            #Sleep both here and in the main while loop result in better CPU usage than just putting "pass" in the main while loop.
+            sleep(0.2)
+            print(str(self._adc_output))
+            #self._weight_gr = self._adc_output / self._calibration_factor #It is important to keep track of true weight at this point so that weight measurements from different times, or old, are not added together.
+            #self._weight_gr = self._adc_output
 
 #(0): threading.Thread class needs an iterable of arguments as the args parameter. You're passing args=(threadnum) which is a single int object, you need to pass some iterable object that would allow multiple args, even when you only want to pass one arg. Link: https://stackoverflow.com/questions/49947814/python-threading-error-must-be-an-iterable-not-int
 #(1): https://stackoverflow.com/questions/30273596/how-to-pass-list-to-python-worker-thread
